@@ -1,51 +1,10 @@
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import React, { useState } from "react";
-import styled from "styled-components"
 import { auth } from "../firebase";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { FirebaseError } from "firebase/app";
+import { Error, Form, FormTitle, FormWrapper, Input, SubmitInput, Switch } from "./ui/account-ui";
 
-const Wrapper = styled.div`
-    width: 480px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-`;
-const Title = styled.h1`
-    margin-top: 48px;
-    font-size: 24px;
-    font-weight: 800;
-`;
-const Form = styled.form`
-    margin-top: 32px;
-    width: 80%;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-`;
-const Input = styled.input`
-    height: 48px;
-    border-radius: 24px;
-    padding: 4px 16px;
-    font-size: 16px;
-    font-weight: 600;
-    color: darkblue;
-    &[type="submit"]{
-        background-color: slategrey;
-        color: linen;
-        cursor: pointer;
-        &:hover{
-            opacity: 0.8;
-        }
-    }
-`;
-const Error = styled.span`
-    width: 64%;
-    margin-top: 8px;
-    font-size: 20px;
-    color: darkred;
-    font-weight: 600;
-`
 export default function NewAccount(){
     const navigage = useNavigate();
     const [is_loading, setLoading] = useState(false);
@@ -76,12 +35,11 @@ export default function NewAccount(){
             setLoading(true);
             //create account
             const credentials = await createUserWithEmailAndPassword(auth, email, password);
-            console.log(credentials.user);
+            // console.log(credentials.user);
             //update profile
             await updateProfile(credentials.user,{
                 displayName: name
             })
-
             navigage("/")
         }catch(err){
             //error message
@@ -98,8 +56,8 @@ export default function NewAccount(){
     }
 
     return(
-        <Wrapper>
-            <Title>Join ❌</Title>
+        <FormWrapper>
+            <FormTitle>Join ❌</FormTitle>
             <Form onSubmit={onSubmit}>
                 <Input name="name" onChange={handleChange} value={name}
                     placeholder="Your Name" type="text" required/>
@@ -107,9 +65,11 @@ export default function NewAccount(){
                     placeholder="Your email" type="email" required/>
                 <Input name="password" onChange={handleChange} value={password}
                     placeholder="Your Password" type="password" required/>
-                <Input type="submit" value={is_loading ? "Loading..." : "Create Account"} />
+                {/* <Input type="submit" value={is_loading ? "Loading..." : "Create Account"} /> */}
+                <SubmitInput is_loading={is_loading} label="Create Account" />
             </Form>
             {error !== "" ? <Error>{error}</Error> : null}
-        </Wrapper>
+            <Switch>If you have an account. move to <Link to={"/login"}>Login</Link>.</Switch>
+        </FormWrapper>
     )
 }
